@@ -1,6 +1,7 @@
-export interface User {
+export interface UserRow {
   id: string;
   name: string;
+  code: string;
   created_at: string;
 }
 
@@ -12,7 +13,7 @@ export const VALID_CATEGORIES: TicketCategory[] = ["Bug", "Feature Request", "Su
 export const VALID_PRIORITIES: TicketPriority[] = ["Low", "Medium", "High", "Critical"];
 export const VALID_STATUSES: TicketStatus[] = ["Open", "In Progress", "Resolved"];
 
-export interface Ticket {
+export interface TicketRow {
   id: string;
   user_id: string;
   title: string;
@@ -22,24 +23,22 @@ export interface Ticket {
   status: TicketStatus;
   created_at: string;
   updated_at: string;
-  users?: { name: string } | null;
 }
 
-export interface TicketWithUser extends Ticket {
-  users: { name: string };
-}
-
-export interface Comment {
+export interface CommentRow {
   id: string;
   ticket_id: string;
   user_id: string;
   content: string;
   created_at: string;
+}
+
+export interface Ticket extends TicketRow {
   users?: { name: string } | null;
 }
 
-export interface CommentWithUser extends Comment {
-  users: { name: string };
+export interface Comment extends CommentRow {
+  users?: { name: string } | null;
 }
 
 export const STATUS_COLORS: Record<TicketStatus, string> = {

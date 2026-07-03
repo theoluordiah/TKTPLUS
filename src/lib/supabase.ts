@@ -1,15 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
-import type { User, Ticket, Comment } from "./types";
+import type { UserRow, TicketRow, CommentRow } from "./types";
 
 export type Database = {
   public: {
     Tables: {
       users: {
-        Row: User;
+        Row: UserRow;
         Insert: { name: string; code: string };
+        Update: { name?: string; code?: string };
       };
       tickets: {
-        Row: Ticket;
+        Row: TicketRow;
         Insert: {
           user_id: string;
           title: string;
@@ -23,11 +24,14 @@ export type Database = {
         };
       };
       comments: {
-        Row: Comment;
+        Row: CommentRow;
         Insert: {
           ticket_id: string;
           user_id: string;
           content: string;
+        };
+        Update: {
+          content?: string;
         };
       };
     };
