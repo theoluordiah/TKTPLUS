@@ -29,7 +29,7 @@ export default function Home() {
               href="/admin/login"
               className="block w-full py-2 px-6 text-center text-sm text-gray-500 hover:text-gray-700 transition"
             >
-              Admin Login
+             
             </Link>
           </div>
         </div>
