@@ -1,6 +1,40 @@
 import { createClient } from "@supabase/supabase-js";
+import type { User, Ticket, Comment } from "./types";
 
-let client: ReturnType<typeof createClient> | null = null;
+export type Database = {
+  public: {
+    Tables: {
+      users: {
+        Row: User;
+        Insert: { name: string; code: string };
+      };
+      tickets: {
+        Row: Ticket;
+        Insert: {
+          user_id: string;
+          title: string;
+          description: string;
+          category: string;
+          priority: string;
+        };
+        Update: {
+          status?: string;
+          updated_at?: string;
+        };
+      };
+      comments: {
+        Row: Comment;
+        Insert: {
+          ticket_id: string;
+          user_id: string;
+          content: string;
+        };
+      };
+    };
+  };
+};
+
+let client: ReturnType<typeof createClient<Database>> | null = null;
 
 export function getSupabase() {
   if (!client) {
@@ -13,7 +47,7 @@ export function getSupabase() {
       );
     }
 
-    client = createClient(supabaseUrl, supabaseServiceKey);
+    client = createClient<Database>(supabaseUrl, supabaseServiceKey);
   }
   return client;
 }

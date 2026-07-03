@@ -29,6 +29,25 @@ input, textarea, select {
   color: #171717;
 }
 
+.dark input, .dark textarea, .dark select {
+  color: #e5e7eb;
+}
+
 input::placeholder, textarea::placeholder {
   color: #9ca3af;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
 }

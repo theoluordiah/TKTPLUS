@@ -1,51 +1,75 @@
 "use client";
 
 import { useState, useEffect, useActionState } from "react";
-import { submitTicketAction, getUserTicketsAction } from "@/lib/actions";
+import { submitTicketAction, getUserTicketsAction, userLogoutAction } from "@/lib/actions";
+import { STATUS_COLORS, PRIORITY_COLORS } from "@/lib/types";
+import type { Ticket, TicketStatus, TicketPriority } from "@/lib/types";
 import Link from "next/link";
 
-const statusColors: Record<string, string> = {
-  Open: "bg-yellow-100 text-yellow-800",
-  "In Progress": "bg-blue-100 text-blue-800",
-  Resolved: "bg-green-100 text-green-800",
-};
+function TicketList({ tickets }: { tickets: Ticket[] }) {
+  if (tickets.length === 0) return null;
 
-const priorityColors: Record<string, string> = {
-  Low: "bg-gray-100 text-gray-600",
-  Medium: "bg-yellow-100 text-yellow-800",
-  High: "bg-orange-100 text-orange-800",
-  Critical: "bg-red-100 text-red-800",
-};
-
-type Ticket = {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  priority: string;
-  status: string;
-  created_at: string;
-};
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden">
+      <div className="px-6 py-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Recent Tickets</h2>
+      </div>
+      <div className="divide-y dark:divide-gray-700">
+        {tickets.slice(0, 5).map((ticket) => (
+          <Link
+            key={ticket.id}
+            href={`/tickets/${ticket.id}`}
+            className="px-6 py-4 block hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-medium text-gray-900 dark:text-white truncate">{ticket.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{ticket.description}</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${PRIORITY_COLORS[ticket.priority as TicketPriority]}`}>
+                  {ticket.priority}
+                </span>
+                <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[ticket.status as TicketStatus]}`}>
+                  {ticket.status}
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+      {tickets.length > 5 && (
+        <Link
+          href="/dashboard"
+          className="block px-6 py-3 text-center text-sm text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+        >
+          View all {tickets.length} tickets
+        </Link>
+      )}
+    </div>
+  );
+}
 
 export default function SubmitPage() {
-  const [state, action, pending] = useActionState(
-    async (_prev: unknown, formData: FormData) => submitTicketAction(formData),
-    undefined,
-  );
+  const [state, action, pending] = useActionState(submitTicketAction, undefined);
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getUserTicketsAction().then((res) => setTickets(res.tickets));
+    getUserTicketsAction().then((res) => {
+      setTickets(res.tickets);
+      setLoading(false);
+    });
   }, [state?.success]);
 
   if (state?.success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="max-w-md w-full mx-4 text-center">
-          <div className="bg-white p-8 rounded-lg shadow-sm border">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border dark:border-gray-700">
             <div className="text-green-500 text-5xl mb-4">&#10003;</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Ticket Submitted!</h1>
-            <p className="text-gray-600 mb-6">Your ticket has been submitted successfully.</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Ticket Submitted!</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Your ticket has been submitted successfully.</p>
             <Link
               href="/submit"
               className="block w-full py-2 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition text-center"
@@ -53,10 +77,10 @@ export default function SubmitPage() {
               Submit Another Ticket
             </Link>
             <Link
-              href="/"
-              className="block mt-3 text-sm text-gray-500 hover:text-gray-700"
+              href="/dashboard"
+              className="block mt-3 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             >
-              Back to Home
+              View My Tickets
             </Link>
           </div>
         </div>
@@ -65,20 +89,32 @@ export default function SubmitPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="max-w-3xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Submit a Ticket</h1>
-          <p className="text-gray-600">Describe your issue or request</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Submit a Ticket</h1>
+            <p className="text-gray-600 dark:text-gray-400">Describe your issue or request</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="text-sm text-blue-600 hover:underline">
+              Dashboard
+            </Link>
+            <form action={userLogoutAction}>
+              <button type="submit" className="text-sm text-red-600 hover:underline">
+                Logout
+              </button>
+            </form>
+          </div>
         </div>
 
-        <form action={action} className="bg-white p-8 rounded-lg shadow-sm border space-y-4 mb-8">
+        <form action={action} className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border dark:border-gray-700 space-y-4 mb-8">
           {state?.error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded text-sm">{state.error}</div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded text-sm">{state.error}</div>
           )}
 
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Title
             </label>
             <input
@@ -86,13 +122,13 @@ export default function SubmitPage() {
               name="title"
               type="text"
               required
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Brief summary of the issue"
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description
             </label>
             <textarea
@@ -100,20 +136,20 @@ export default function SubmitPage() {
               name="description"
               required
               rows={5}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Detailed description of the issue or request..."
             />
           </div>
 
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Category
             </label>
             <select
               id="category"
               name="category"
               required
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="">Select a category</option>
               <option value="Bug">Bug</option>
@@ -124,14 +160,14 @@ export default function SubmitPage() {
           </div>
 
           <div>
-            <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Priority
             </label>
             <select
               id="priority"
               name="priority"
               required
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="">Select priority</option>
               <option value="Low">Low</option>
@@ -150,37 +186,16 @@ export default function SubmitPage() {
           </button>
         </form>
 
-        {tickets.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="px-6 py-4 border-b bg-gray-50">
-              <h2 className="text-lg font-semibold text-gray-900">Your Tickets</h2>
-            </div>
-            <div className="divide-y">
-              {tickets.map((ticket) => (
-                <div key={ticket.id} className="px-6 py-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-medium text-gray-900 truncate">{ticket.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">{ticket.description}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {new Date(ticket.created_at).toLocaleDateString("en-US", {
-                          month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${priorityColors[ticket.priority]}`}>
-                        {ticket.priority}
-                      </span>
-                      <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${statusColors[ticket.status]}`}>
-                        {ticket.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+        {loading ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
             </div>
           </div>
+        ) : (
+          <TicketList tickets={tickets} />
         )}
       </div>
     </div>
