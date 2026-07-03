@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import type { UserRow, TicketRow, CommentRow } from "./types";
 
 export type Database = {
@@ -38,9 +38,9 @@ export type Database = {
   };
 };
 
-let client: ReturnType<typeof createClient<Database>> | null = null;
+let client: SupabaseClient<Database> | null = null;
 
-export function getSupabase() {
+export function getSupabase(): SupabaseClient<Database> {
   if (!client) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
