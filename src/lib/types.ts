@@ -1,4 +1,4 @@
-export interface UserRow {
+export type UserRow = {
   id: string;
   name: string;
   code: string;
@@ -13,7 +13,7 @@ export const VALID_CATEGORIES: TicketCategory[] = ["Bug", "Feature Request", "Su
 export const VALID_PRIORITIES: TicketPriority[] = ["Low", "Medium", "High", "Critical"];
 export const VALID_STATUSES: TicketStatus[] = ["Open", "In Progress", "Resolved"];
 
-export interface TicketRow {
+export type TicketRow = {
   id: string;
   user_id: string;
   title: string;
@@ -25,7 +25,7 @@ export interface TicketRow {
   updated_at: string;
 }
 
-export interface CommentRow {
+export type CommentRow = {
   id: string;
   ticket_id: string;
   user_id: string;
