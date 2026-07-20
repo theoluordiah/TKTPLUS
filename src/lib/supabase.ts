@@ -38,6 +38,8 @@ export type Database = {
         Relationships: [];
       };
     };
+    Views: {};
+    Functions: {};
   };
 };
 

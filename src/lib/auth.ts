@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { createHash, createHmac } from "crypto";
 import bcrypt from "bcryptjs";
 import { getSupabase } from "./supabase";
-import type { User } from "./types";
+import type { UserRow as User } from "./types";
 
 const SESSION_COOKIE = "session";
 const ADMIN_COOKIE = "admin_session";
