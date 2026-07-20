@@ -12,7 +12,7 @@ import {
   getSession,
   getAdminSession,
 } from "./auth";
-import { VALID_CATEGORIES, VALID_PRIORITIES, VALID_STATUSES } from "./types";
+import { VALID_CATEGORIES, VALID_PRIORITIES, VALID_STATUSES, type TicketCategory, type TicketPriority, type TicketStatus } from "./types";
 
 export async function registerAction(_prev: unknown, formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
@@ -188,13 +188,13 @@ export async function getFilteredTicketsAction(params: {
     .select("*, users(name)", { count: "exact" });
 
   if (status && VALID_STATUSES.includes(status as never)) {
-    query = query.eq("status", status);
+    query = query.eq("status", status as TicketStatus);
   }
   if (category && VALID_CATEGORIES.includes(category as never)) {
-    query = query.eq("category", category);
+    query = query.eq("category", category as TicketCategory);
   }
   if (priority && VALID_PRIORITIES.includes(priority as never)) {
-    query = query.eq("priority", priority);
+    query = query.eq("priority", priority as TicketPriority);
   }
   if (search) {
     query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
