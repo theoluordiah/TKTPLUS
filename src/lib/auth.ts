@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { createHash, createHmac } from "crypto";
+import { createHash, createHmac, timingSafeEqual } from "crypto";
 import bcrypt from "bcryptjs";
 import { getSupabase } from "./supabase";
 import type { UserRow as User } from "./types";
@@ -41,11 +41,11 @@ function decode(str: string): Record<string, unknown> | null {
 
 function compareSignatures(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
-  return createHmac("sha256", getSessionSecret())
-    .update(a)
-    .digest() === createHmac("sha256", getSessionSecret())
-    .update(b)
-    .digest();
+  try {
+    return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  } catch {
+    return false;
+  }
 }
 
 export type Session = { userId: string; userName: string } | null;
