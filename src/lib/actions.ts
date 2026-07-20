@@ -86,7 +86,7 @@ export async function adminLoginAction(_prev: unknown, formData: FormData) {
   if (password !== adminPassword) return { error: "Invalid password" };
 
   await setAdminSession();
-  redirect("/admin/tickets");
+  return { success: true };
 }
 
 export async function getUserTicketsAction() {

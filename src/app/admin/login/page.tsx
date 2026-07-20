@@ -3,9 +3,18 @@
 import { useActionState } from "react";
 import { adminLoginAction } from "@/lib/actions";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [state, action, pending] = useActionState(adminLoginAction, undefined);
+
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/admin/tickets");
+    }
+  }, [state, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
