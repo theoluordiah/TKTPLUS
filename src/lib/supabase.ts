@@ -8,6 +8,7 @@ export type Database = {
         Row: UserRow;
         Insert: { name: string; code: string };
         Update: { name?: string; code?: string };
+        Relationships: [];
       };
       tickets: {
         Row: TicketRow;
@@ -22,6 +23,7 @@ export type Database = {
           status?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       comments: {
         Row: CommentRow;
@@ -33,6 +35,7 @@ export type Database = {
         Update: {
           content?: string;
         };
+        Relationships: [];
       };
     };
   };
